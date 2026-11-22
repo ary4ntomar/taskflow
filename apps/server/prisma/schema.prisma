@@ -1,0 +1,61 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                  Int             @id @default(autoincrement())
+  username            String          @unique
+  password            String
+  createdAt           DateTime        @default(now())
+  adminOrganization   Organization[]  @relation("admin")
+  userOrganization    Organization[]  @relation("member")
+  issues              Issues[]
+  refreshToken        RefreshToken[]
+}
+
+model Organization {
+  id            Int       @id @default(autoincrement())
+  title         String
+  description   String
+  adminId       Int
+  admin         User      @relation( "admin", fields: [adminId],references: [id]) 
+  user          User[]      @relation("member")
+  boards        Board[]
+}
+
+model Board {
+  id              Int               @id @default(autoincrement())
+  title           String
+  organizationId  Int
+  organization    Organization      @relation(fields: [organizationId], references: [id])
+  issues          Issues[]
+}
+
+model Issues {
+  id             Int        @id @default(autoincrement())
+  title          String
+  boardId        Int
+  status        String      @default("upnext")
+  board         Board        @relation(fields: [boardId],references: [id]) 
+  userId        Int?
+  assignedTo    User?        @relation(fields: [userId], references: [id])
+}
+
+model RefreshToken {
+   id          Int        @id @default(autoincrement())
+   userId      Int
+   tokenHash   String     @unique
+   expireAt    DateTime
+   revokedAt   DateTime?
+   createdAt   DateTime   @default(now())
+
+   user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+
+
