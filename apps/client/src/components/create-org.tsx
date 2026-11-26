@@ -24,11 +24,14 @@ export function CreateOrganizationDialog() {
   const queryClient = useQueryClient()
 
   const createOrganization = useMutation({
-    mutationFn: async (organization: { title: string; description: string }) => {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"
+    mutationFn: async (organization: {
+      title: string
+      description: string
+    }) => {
+      const apiURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
 
       try {
-        return await axios.post(`${apiUrl}/organization`, organization, {
+        return await axios.post(`${apiURL}/organization`, organization, {
           withCredentials: true,
         })
       } catch (error) {
@@ -36,11 +39,11 @@ export function CreateOrganizationDialog() {
           throw error
         }
 
-        await axios.post(`${apiUrl}/auth/refresh`, null, {
+        await axios.post(`${apiURL}/auth/refresh`, null, {
           withCredentials: true,
         })
 
-        return axios.post(`${apiUrl}/organization`, organization, {
+        return axios.post(`${apiURL}/organization`, organization, {
           withCredentials: true,
         })
       }
@@ -98,7 +101,10 @@ export function CreateOrganizationDialog() {
           </div>
 
           <div className="grid gap-2">
-            <label htmlFor="organization-description" className="text-sm font-medium">
+            <label
+              htmlFor="organization-description"
+              className="text-sm font-medium"
+            >
               Description
             </label>
             <Textarea
@@ -113,16 +119,23 @@ export function CreateOrganizationDialog() {
 
           {createOrganization.isError && (
             <p role="alert" className="text-sm text-destructive">
-              Couldn’t create the organization. Check your details and try again.
+              Couldn’t create the organization. Check your details and try
+              again.
             </p>
           )}
 
           <DialogFooter>
             <Button
               type="submit"
-              disabled={createOrganization.isPending || !title.trim() || !description.trim()}
+              disabled={
+                createOrganization.isPending ||
+                !title.trim() ||
+                !description.trim()
+              }
             >
-              {createOrganization.isPending ? "Creating…" : "Create organization"}
+              {createOrganization.isPending
+                ? "Creating…"
+                : "Create organization"}
             </Button>
           </DialogFooter>
         </form>

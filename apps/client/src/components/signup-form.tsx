@@ -22,19 +22,19 @@ export function SignupForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-   const router = useRouter()
+  const router = useRouter()
   const [username, setUsername] = useState<string>("")
   const [pass, setPass] = useState<string>("")
   const [confirmPass, setConfirmPass] = useState<string>("")
   const [error, setError] = useState<string>("")
 
-  const handleSubmit = async (event:React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault()
     setError("")
 
     if (pass !== confirmPass) {
       setError("Password don't match")
-      return;
+      return
     }
 
     const result = signupSchema.safeParse({
@@ -48,8 +48,9 @@ export function SignupForm({
     }
 
     try {
+      const apiURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
       await axios.post(
-        "http://localhost:3001/auth/signup",
+        `${apiURL}/auth/signup`,
         {
           username: result.data.username,
           password: result.data.password,
@@ -62,7 +63,6 @@ export function SignupForm({
         }
       )
       router.push("/organization")
-      
     } catch (err) {
       setError("Something is wrong please try again")
       return
@@ -125,7 +125,11 @@ export function SignupForm({
                 <FieldDescription>
                   Must be at least 8 characters long.
                 </FieldDescription>
-                 {error && <p role="alert" className="text-destructive">{error}</p>}
+                {error && (
+                  <p role="alert" className="text-destructive">
+                    {error}
+                  </p>
+                )}
               </Field>
               <Field>
                 <Button type="submit">Create Account</Button>

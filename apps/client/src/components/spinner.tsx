@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/empty"
 import { Spinner } from "@/components/ui/spinner"
 
-export function SpinnerEmpty(input:string,description:string) {
+export function SpinnerEmpty(input: string, description: string) {
   return (
     <Empty className="w-full">
       <EmptyHeader>
@@ -17,9 +17,7 @@ export function SpinnerEmpty(input:string,description:string) {
           <Spinner />
         </EmptyMedia>
         <EmptyTitle>{input}</EmptyTitle>
-        <EmptyDescription>
-         {description}
-        </EmptyDescription>
+        <EmptyDescription>{description}</EmptyDescription>
       </EmptyHeader>
       <EmptyContent>
         <Button variant="outline" size="sm">

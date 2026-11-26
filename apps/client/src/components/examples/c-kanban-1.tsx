@@ -16,11 +16,7 @@ import {
   KanbanItemHandle,
   KanbanOverlay,
 } from "@/components/reui/kanban"
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { GripVerticalIcon, XIcon } from "lucide-react"
@@ -80,7 +76,9 @@ function normalizePriority(priority?: string): Priority {
   return "medium"
 }
 
-function groupIssuesByColumn(issues: ApiIssue[] = []): Record<ColumnKey, Task[]> {
+function groupIssuesByColumn(
+  issues: ApiIssue[] = []
+): Record<ColumnKey, Task[]> {
   const grouped: Record<ColumnKey, Task[]> = {
     upNext: [],
     inProgress: [],
@@ -116,13 +114,12 @@ function IssueAssignee({ issueId }: { issueId: string }) {
     retry: false,
     queryFn: async () => {
       try {
-        const res = await axios.get<MemberResponse>(
-          "http://localhost:3001/members",
-          {
-            params: { issueId: numericId },
-            withCredentials: true,
-          }
-        )
+        const apiURL =
+          process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+        const res = await axios.get<MemberResponse>(`${apiURL}/members`, {
+          params: { issueId: numericId },
+          withCredentials: true,
+        })
         return res.data.members?.[0]?.username ?? null
       } catch (err) {
         if (axios.isAxiosError(err) && err.response?.status === 404) {
@@ -151,8 +148,10 @@ function IssueAssignee({ issueId }: { issueId: string }) {
   )
 }
 
-interface TaskCardProps
-  extends Omit<ComponentProps<typeof KanbanItem>, "value" | "children"> {
+interface TaskCardProps extends Omit<
+  ComponentProps<typeof KanbanItem>,
+  "value" | "children"
+> {
   task: Task
   asHandle?: boolean
   isOverlay?: boolean
@@ -190,7 +189,7 @@ function TaskCard({
           {task.priority}
         </Badge>
       </div>
-      <div className="text-muted-foreground flex items-center justify-between text-xs">
+      <div className="flex items-center justify-between text-xs text-muted-foreground">
         <IssueAssignee issueId={task.id} />
         {task.dueDate && (
           <time className="text-[10px] whitespace-nowrap tabular-nums">
@@ -210,7 +209,7 @@ function TaskCard({
             aria-label={`Remove ${task.title}`}
             disabled={isDeleting}
             onClick={handleRemove}
-            className="text-muted-foreground hover:text-destructive hover:bg-muted absolute top-2 right-2 z-10 flex size-5 items-center justify-center rounded-sm transition-colors disabled:opacity-50"
+            className="absolute top-2 right-2 z-10 flex size-5 items-center justify-center rounded-sm text-muted-foreground transition-colors hover:bg-muted hover:text-destructive disabled:opacity-50"
           >
             <XIcon className="size-3.5" />
           </button>
@@ -225,8 +224,10 @@ function TaskCard({
   )
 }
 
-interface TaskColumnProps
-  extends Omit<ComponentProps<typeof KanbanColumn>, "children" | "value"> {
+interface TaskColumnProps extends Omit<
+  ComponentProps<typeof KanbanColumn>,
+  "children" | "value"
+> {
   value: ColumnKey
   tasks: Task[]
   isOverlay?: boolean
@@ -284,13 +285,14 @@ export function Pattern() {
   const boardId = Number(searchParams.get("boardId"))
   const isValidBoard = Number.isInteger(boardId) && boardId > 0
 
-  const [columns, setColumns] = useState<Record<ColumnKey, Task[]>>(EMPTY_COLUMNS)
-
+  const [columns, setColumns] =
+    useState<Record<ColumnKey, Task[]>>(EMPTY_COLUMNS)
+  const apiURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
   const issuesQuery = useQuery({
     queryKey: ["issues", boardId],
     enabled: isValidBoard,
     queryFn: async () => {
-      const res = await axios.get("http://localhost:3001/issues", {
+      const res = await axios.get(`${apiURL}/issues`, {
         params: { boardId },
         withCredentials: true,
       })
@@ -315,7 +317,7 @@ export function Pattern() {
       const apiStatus =
         status === "inProgress" ? "inprogress" : status.toLowerCase()
       await axios.put(
-        "http://localhost:3001/issues",
+        `${apiURL}/issues`,
         { status: apiStatus },
         {
           params: { issueId },
@@ -330,9 +332,7 @@ export function Pattern() {
 
   const deleteIssue = useMutation({
     mutationFn: async (issueId: number) => {
-      // Matches `issueRouter.delete("/issues", ...)` when mounted at "/"
-      // Change URL to "http://localhost:3001/issues" if your route path is "/"
-      await axios.delete("http://localhost:3001/issues", {
+      await axios.delete(`${apiURL}/issues`, {
         params: { issueId },
         withCredentials: true,
       })
@@ -387,18 +387,32 @@ export function Pattern() {
 
   if (!isValidBoard) {
     return (
-      <p className="text-muted-foreground text-sm">
+      <p className="text-sm text-muted-foreground">
         Select a valid board in the URL (`?boardId=1`).
       </p>
     )
   }
 
   if (issuesQuery.isPending) {
-    return <div className="text-muted-foreground text-sm">{SpinnerEmpty("please wait while processing your request"," Please wait while we process your request. Do not refresh the page.")}</div>
+    return (
+      <div className="text-sm text-muted-foreground">
+        {SpinnerEmpty(
+          "please wait while processing your request",
+          " Please wait while we process your request. Do not refresh the page."
+        )}
+      </div>
+    )
   }
 
   if (issuesQuery.isError) {
-    return <div className="text-destructive text-sm">{SpinnerEmpty("Failed to load your issue","Try again after few Seconds.")}</div>
+    return (
+      <div className="text-sm text-destructive">
+        {SpinnerEmpty(
+          "Failed to load your issue",
+          "Try again after few Seconds."
+        )}
+      </div>
+    )
   }
 
   return (
@@ -418,7 +432,7 @@ export function Pattern() {
           />
         ))}
       </KanbanBoard>
-      <KanbanOverlay className="bg-muted/10 rounded-md border-2 border-dashed" />
+      <KanbanOverlay className="rounded-md border-2 border-dashed bg-muted/10" />
     </Kanban>
   )
 }

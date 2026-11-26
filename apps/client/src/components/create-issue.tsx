@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input"
 
 export function CreateIssueDialog({ boardId }: { boardId: number }) {
   type Priority = "low" | "medium" | "high"
-const [priority, setPriority] = useState<Priority>("medium")
+  const [priority, setPriority] = useState<Priority>("medium")
   const [open, setOpen] = useState(false)
   const [title, setTitle] = useState("")
   const [assignedTo, setAssignedTo] = useState("")
@@ -30,19 +30,19 @@ const [priority, setPriority] = useState<Priority>("medium")
       assignedTo: string
       priority: Priority
     }) => {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"
+      const apiURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
       const body = { ...fields, boardId }
       const config = { withCredentials: true }
 
       try {
-        await axios.post(`${apiUrl}/issue`, body, config)
+        await axios.post(`${apiURL}/issue`, body, config)
       } catch (error) {
         if (!axios.isAxiosError(error) || error.response?.status !== 401) {
           throw error
         }
 
-        await axios.post(`${apiUrl}/auth/refresh`, null, config)
-        await axios.post(`${apiUrl}/issue`, body, config)
+        await axios.post(`${apiURL}/auth/refresh`, null, config)
+        await axios.post(`${apiURL}/issue`, body, config)
       }
     },
     onSuccess: () => {
@@ -111,7 +111,7 @@ const [priority, setPriority] = useState<Priority>("medium")
               required
             />
           </label>
-         
+
           <label className="grid gap-2 text-sm font-medium">
             Assignee username
             <Input
@@ -123,24 +123,24 @@ const [priority, setPriority] = useState<Priority>("medium")
             />
           </label>
           <label className="grid gap-2 text-sm font-medium">
-  Priority
-  <select
-    value={priority}
-    onChange={(event) => setPriority(event.target.value as Priority)}
-    disabled={createIssue.isPending}
-    className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
-  >
-    <option value="low">Low</option>
-    <option value="medium">Medium</option>
-    <option value="high">High</option>
-  </select>
-</label>
+            Priority
+            <select
+              value={priority}
+              onChange={(event) => setPriority(event.target.value as Priority)}
+              disabled={createIssue.isPending}
+              className="h-9 w-full rounded-md border border-input bg-background px-3 text-sm"
+            >
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+          </label>
 
           {createIssue.isError && (
             <p role="alert" className="text-sm text-destructive">
               {axios.isAxiosError<{ message?: string }>(createIssue.error)
-                ? createIssue.error.response?.data?.message ??
-                  "Couldn’t create the issue. Please try again."
+                ? (createIssue.error.response?.data?.message ??
+                  "Couldn’t create the issue. Please try again.")
                 : "Couldn’t create the issue. Please try again."}
             </p>
           )}

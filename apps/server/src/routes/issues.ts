@@ -87,11 +87,10 @@ issueRouter.post("/issue", authMiddleware, async (req, res) => {
 
   //sucess response
   res.json({
-
-   id: issue.id,
-  received: req.body.priority ?? null,
-  parsed: priority,
-  saved: issue.priority,
+    id: issue.id,
+    received: req.body.priority ?? null,
+    parsed: priority,
+    saved: issue.priority,
     message: "Issues added successfully",
   });
 });

@@ -10,7 +10,7 @@ import cors from "cors";
 
 // After const app = express(), before the routers
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin:   process.env.CLIENT_URL|| "http://localhost:3000",
   credentials: true,
 }));
 
@@ -23,6 +23,7 @@ app.use(orgRouter);
 app.use(boardRouter);
 app.use(issueRouter);
 
-app.listen(3001, () => {
-  console.log("App is listening on port 3001");
+const PORT = process.env.PORT || 3001
+app.listen( PORT , () => {
+  console.log(`Server running on port ${PORT}`);
 });

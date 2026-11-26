@@ -112,9 +112,11 @@ orgRouter.get("/my-organizations", authMiddleware, async (req, res) => {
 
 //.........show specific org detail ..............
 orgRouter.get("/organization", authMiddleware, async (req, res) => {
-  //user send org id  
+  //user send org id
   const orgId = Number(req.query.organizationId);
-  const { data, success, error } = getOrgSchema.safeParse({organizationId:orgId});
+  const { data, success, error } = getOrgSchema.safeParse({
+    organizationId: orgId,
+  });
   if (!success)
     return res.status(400).json({
       message: "invlaid OrgID",
@@ -129,23 +131,25 @@ orgRouter.get("/organization", authMiddleware, async (req, res) => {
       id: organizationId,
     },
     include: {
-        admin: { select: { username: true } },
+      admin: { select: { username: true } },
       user: { select: { id: true, username: true } },
     },
   });
 
   if (!organization) {
-  return res.status(404).json({ message: "Organization not found" });
-}
+    return res.status(404).json({ message: "Organization not found" });
+  }
 
-const isAdmin = organization.adminId === req.userId;
-const isMember = organization.user.some((member) => member.id === req.userId);
+  const isAdmin = organization.adminId === req.userId;
+  const isMember = organization.user.some((member) => member.id === req.userId);
 
-if (!isAdmin && !isMember) {
-  return res.status(403).json({ message: "You do not have access to this organization" });
-}
+  if (!isAdmin && !isMember) {
+    return res
+      .status(403)
+      .json({ message: "You do not have access to this organization" });
+  }
 
-return res.json({ organization, isAdmin });
+  return res.json({ organization, isAdmin });
 });
 
 //.......Delete member from organization..........

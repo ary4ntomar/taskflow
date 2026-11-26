@@ -7,8 +7,6 @@ export const boardRouter = Router();
 //..........create Board .........
 
 boardRouter.post("/boards", authMiddleware, async (req, res) => {
-  //get data from user
-
   const { data, success, error } = baordSchema.safeParse(req.body);
   if (!success)
     return res.status(400).json({
@@ -32,11 +30,11 @@ boardRouter.post("/boards", authMiddleware, async (req, res) => {
     return;
   }
 
-  if(org.adminId !== req.userId){
-    return res.status(403).json({message:"You do not have permission to create the board"})
+  if (org.adminId !== req.userId) {
+    return res
+      .status(403)
+      .json({ message: "You do not have permission to create the board" });
   }
-
-
 
   //if found then create board and push data into board array
 

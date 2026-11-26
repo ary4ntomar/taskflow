@@ -1,4 +1,4 @@
-import  { Router } from "express";
+import { Router } from "express";
 import { signupRoute } from "../auth/signup.js";
 import { signinRoute } from "../auth/signin.js";
 import { refreshRoute } from "../auth/refresh.js";

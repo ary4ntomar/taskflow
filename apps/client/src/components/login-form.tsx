@@ -22,16 +22,14 @@ export function LoginForm({
   ...props
 }: React.ComponentProps<"div">) {
   const router = useRouter()
-       const [username, setUsername] = useState<string>("")
-       const [pass, setPass] = useState<string>("")
-       const [error, setError] = useState<string>("")
+  const [username, setUsername] = useState<string>("")
+  const [pass, setPass] = useState<string>("")
+  const [error, setError] = useState<string>("")
 
-    
-  const handleSubmit = async (event:React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event?.preventDefault()
     setError("")
 
-   
     const result = signinSchema.safeParse({
       username,
       password: pass,
@@ -41,9 +39,11 @@ export function LoginForm({
       return
     }
 
+    const apiURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+
     try {
       await axios.post(
-        "http://localhost:3001/auth/signin",
+        `${apiURL}/auth/signin`,
         {
           username: result.data.username,
           password: result.data.password,
@@ -56,15 +56,14 @@ export function LoginForm({
         }
       )
       router.push("/organization")
-    }     
-    catch (err) {
+    } catch (err) {
       setError("Something is wrong please try again")
       return
     }
   }
 
   return (
-    <div className={cn("flex flex-col gap-6 ", className)} {...props}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
           <form className="p-6 md:p-8" onSubmit={handleSubmit}>
@@ -79,7 +78,7 @@ export function LoginForm({
                 <FieldLabel htmlFor="email">Username</FieldLabel>
                 <Input
                   value={username}
-                  onChange={(e)=>setUsername(e.target.value)}
+                  onChange={(e) => setUsername(e.target.value)}
                   id="username"
                   type="username"
                   placeholder="Enter your username"
@@ -90,9 +89,20 @@ export function LoginForm({
                 <div className="flex items-center">
                   <FieldLabel htmlFor="password">Password</FieldLabel>
                 </div>
-                <Input value={pass} onChange={(e)=>setPass(e.target.value)} id="password" type="password" placeholder="enter your password" required />
+                <Input
+                  value={pass}
+                  onChange={(e) => setPass(e.target.value)}
+                  id="password"
+                  type="password"
+                  placeholder="enter your password"
+                  required
+                />
               </Field>
-               {error && <p role="alert" className="text-destructive">{error}</p>}
+              {error && (
+                <p role="alert" className="text-destructive">
+                  {error}
+                </p>
+              )}
               <Field>
                 <Button type="submit">Login</Button>
               </Field>
@@ -100,7 +110,8 @@ export function LoginForm({
                 Or continue with
               </FieldSeparator>
               <FieldDescription className="text-center">
-                Don&apos;t have an account? <Link href="/auth/signup">Sign up</Link>
+                Don&apos;t have an account?{" "}
+                <Link href="/auth/signup">Sign up</Link>
               </FieldDescription>
             </FieldGroup>
           </form>

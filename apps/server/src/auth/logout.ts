@@ -4,38 +4,36 @@ import { prisma } from "../config/db.js";
 
 export const logoutRoute = express();
 
-logoutRoute.post("/logout", async (req,res)=>{
-     
-     const refreshToken  = req.cookies.refreshToken ;
-      
-     if(refreshToken){
-        const tokenHash = createHash("sha256")
-       .update(refreshToken)
-       .digest("hex")
+logoutRoute.post("/logout", async (req, res) => {
+  const refreshToken = req.cookies.refreshToken;
 
-     await prisma.refreshToken.updateMany({
-         where: {
-            tokenHash,
-            revokedAt : null
-         }, 
-         data: {
-            revokedAt: new Date()
-         }
-      })
-    };
+  if (refreshToken) {
+    const tokenHash = createHash("sha256").update(refreshToken).digest("hex");
 
-    const cookieOptions = {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax" as const,
-      path: "/",
-    };
+    await prisma.refreshToken.updateMany({
+      where: {
+        tokenHash,
+        revokedAt: null,
+      },
+      data: {
+        revokedAt: new Date(),
+      },
+    });
+  }
 
-     res.clearCookie("refreshToken" , cookieOptions);
-     res.clearCookie("accessToken" , cookieOptions);
+  const isProd = process.env.NODE_ENV === "production";
 
+  const cookieOptions = {
+    httpOnly: true,
+    secure: isProd,
+    sameSite: (isProd ? "none" : "lax") as "none" | "lax",
+    path: "/",
+  };
 
-     return res.status(200).json({
-        message:"Logout Successfull"
-     })
-})
+  res.clearCookie("refreshToken", cookieOptions);
+  res.clearCookie("accessToken", cookieOptions);
+
+  return res.status(200).json({
+    message: "Logout Successfull",
+  });
+});

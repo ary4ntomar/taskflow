@@ -24,8 +24,8 @@ export function AddMembers({ organizationId }: { organizationId: number }) {
 
   const addMember = useMutation({
     mutationFn: async (username: string) => {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"
-      const endpoint = `${apiUrl}/add-member-to-organization`
+      const apiURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
+      const endpoint = `${apiURL}/add-member-to-organization`
       const body = { organizationId, memberUsername: username }
       const config = { withCredentials: true }
 
@@ -36,7 +36,7 @@ export function AddMembers({ organizationId }: { organizationId: number }) {
           throw error
         }
 
-        await axios.post(`${apiUrl}/auth/refresh`, null, config)
+        await axios.post(`${apiURL}/auth/refresh`, null, config)
         await axios.post(endpoint, body, config)
       }
     },

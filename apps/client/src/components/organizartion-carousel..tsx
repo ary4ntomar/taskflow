@@ -42,17 +42,20 @@ export function OrganizationGrid({ items }: { items: Organization[] }) {
                   <Building2 aria-hidden="true" className="size-5" />
                 </div>
 
-                <h2 className="wrap-break-word text-lg font-semibold tracking-tight">
+                <h2 className="text-lg font-semibold tracking-tight wrap-break-word">
                   {org.title}
                 </h2>
-                <p className="mt-2 line-clamp-2 wrap-break-word text-sm leading-relaxed text-muted-foreground">
+                <p className="mt-2 line-clamp-2 text-sm leading-relaxed wrap-break-word text-muted-foreground">
                   {org.description}
                 </p>
               </div>
 
               <div className="flex items-center justify-between gap-2 rounded-b-xl border-t border-border px-5 py-3 text-sm font-medium transition-colors group-hover:bg-primary/5">
                 <span>Open organization</span>
-                <ArrowUpRight aria-hidden="true" className="size-4 text-primary" />
+                <ArrowUpRight
+                  aria-hidden="true"
+                  className="size-4 text-primary"
+                />
               </div>
             </Link>
           </li>

@@ -271,29 +271,29 @@ const UNIFORMS = {
     [52 / 255, 211 / 255, 153 / 255],
   ] as [number, number, number][],
   colorCount: 4,
-  scale: 1.320,
-  intensity: 0.490,
-  paramA: 0.840,
+  scale: 1.32,
+  intensity: 0.49,
+  paramA: 0.84,
   warp: 0.006,
   detail: 1.728,
   contrast: 1.0,
   brightness: 0.0,
   saturation: 1.0,
   hue: 0.0,
-  vignette: 0.000,
-  blur: 0.0400,
+  vignette: 0.0,
+  blur: 0.04,
   grain: 0.025,
   seed: 4984.0,
   rotate: 3.3685,
-  offsetX: -0.130,
-  offsetY: 0.050,
-  drift: 0.400,
+  offsetX: -0.13,
+  offsetY: 0.05,
+  drift: 0.4,
   cursorEnabled: true,
   cursorEffect: 2.0,
-  cursorStrength: 0.540,
+  cursorStrength: 0.54,
   cursorRadius: 0.555,
   oklab: 1.0,
-  timeScale: -0.670,
+  timeScale: -0.67,
 }
 
 const pendingContextReleases = new WeakMap<HTMLCanvasElement, number>()
@@ -308,7 +308,11 @@ export function ShaderBackground({ className }: { className?: string }) {
     const pendingRelease = pendingContextReleases.get(canvas)
     if (pendingRelease !== undefined) window.clearTimeout(pendingRelease)
     pendingContextReleases.delete(canvas)
-    const context = canvas.getContext("webgl", { alpha: true, antialias: false, premultipliedAlpha: false })
+    const context = canvas.getContext("webgl", {
+      alpha: true,
+      antialias: false,
+      premultipliedAlpha: false,
+    })
     if (!context) return
     const gl = context
 
@@ -333,7 +337,7 @@ export function ShaderBackground({ className }: { className?: string }) {
     gl.bufferData(
       gl.ARRAY_BUFFER,
       new Float32Array([-1, -1, 3, -1, -1, 3]),
-      gl.STATIC_DRAW,
+      gl.STATIC_DRAW
     )
     const loc = gl.getAttribLocation(program, "a_position")
     gl.enableVertexAttribArray(loc)
@@ -355,35 +359,35 @@ export function ShaderBackground({ className }: { className?: string }) {
       UNIFORMS.scale,
       UNIFORMS.intensity,
       UNIFORMS.paramA,
-      UNIFORMS.warp,
+      UNIFORMS.warp
     )
     gl.uniform4f(
       uni.surface,
       UNIFORMS.detail,
       UNIFORMS.contrast,
       UNIFORMS.brightness,
-      UNIFORMS.saturation,
+      UNIFORMS.saturation
     )
     gl.uniform4f(
       uni.finish,
       UNIFORMS.hue,
       UNIFORMS.vignette,
       UNIFORMS.blur,
-      UNIFORMS.grain,
+      UNIFORMS.grain
     )
     gl.uniform4f(
       uni.transform,
       UNIFORMS.seed,
       UNIFORMS.rotate,
       UNIFORMS.drift,
-      UNIFORMS.oklab,
+      UNIFORMS.oklab
     )
     gl.uniform4f(
       uni.cursor,
       0,
       UNIFORMS.cursorEffect,
       UNIFORMS.cursorStrength,
-      UNIFORMS.cursorRadius,
+      UNIFORMS.cursorRadius
     )
 
     let targetX = 0
@@ -410,7 +414,7 @@ export function ShaderBackground({ className }: { className?: string }) {
       const rawHeight = Math.max(1, Math.round(bounds.height * dpr))
       const pixelScale = Math.min(
         1,
-        Math.sqrt(2_000_000 / Math.max(1, rawWidth * rawHeight)),
+        Math.sqrt(2_000_000 / Math.max(1, rawWidth * rawHeight))
       )
       const width = Math.max(1, Math.round(rawWidth * pixelScale))
       const height = Math.max(1, Math.round(rawHeight * pixelScale))
@@ -518,21 +522,21 @@ export function ShaderBackground({ className }: { className?: string }) {
         width,
         height,
         ((now - start) / 1000) * UNIFORMS.timeScale,
-        UNIFORMS.colorCount,
+        UNIFORMS.colorCount
       )
       gl.uniform4f(
         uni.space,
         UNIFORMS.offsetX,
         UNIFORMS.offsetY,
         mouseX,
-        mouseY,
+        mouseY
       )
       gl.uniform4f(
         uni.cursor,
         UNIFORMS.cursorEnabled ? cursorPresence : 0,
         UNIFORMS.cursorEffect,
         UNIFORMS.cursorStrength,
-        UNIFORMS.cursorRadius,
+        UNIFORMS.cursorRadius
       )
       gl.drawArrays(gl.TRIANGLES, 0, 3)
       const pointerSettling =
@@ -557,7 +561,7 @@ export function ShaderBackground({ className }: { className?: string }) {
         window.removeEventListener("blur", onPointerLeave)
         document.documentElement.removeEventListener(
           "pointerleave",
-          onPointerLeave,
+          onPointerLeave
         )
       }
       gl.deleteBuffer(buf)

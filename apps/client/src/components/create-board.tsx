@@ -27,19 +27,19 @@ export function CreateBoardDialog({
 
   const createBoard = useMutation({
     mutationFn: async (boardTitle: string) => {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001"
+      const apiURL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001"
       const body = { title: boardTitle, organizationId }
       const config = { withCredentials: true }
 
       try {
-        await axios.post(`${apiUrl}/boards`, body, config)
+        await axios.post(`${apiURL}/boards`, body, config)
       } catch (error) {
         if (!axios.isAxiosError(error) || error.response?.status !== 401) {
           throw error
         }
 
-        await axios.post(`${apiUrl}/auth/refresh`, null, config)
-        await axios.post(`${apiUrl}/boards`, body, config)
+        await axios.post(`${apiURL}/auth/refresh`, null, config)
+        await axios.post(`${apiURL}/boards`, body, config)
       }
     },
     onSuccess: () => {

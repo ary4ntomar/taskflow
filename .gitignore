@@ -1,1 +1,8 @@
 node_modules
+.next
+out
+dist
+build
+.env
+.env*.local
+apps/server/src/generated/prisma
