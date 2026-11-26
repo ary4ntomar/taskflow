@@ -8,7 +8,7 @@ export const boardRouter = Router();
 
 boardRouter.post("/boards", authMiddleware, async (req, res) => {
   //get data from user
-  
+
   const { data, success, error } = baordSchema.safeParse(req.body);
   if (!success)
     return res.status(400).json({
@@ -31,6 +31,13 @@ boardRouter.post("/boards", authMiddleware, async (req, res) => {
     });
     return;
   }
+
+  if(org.adminId !== req.userId){
+    return res.status(403).json({message:"You do not have permission to create the board"})
+  }
+
+
+
   //if found then create board and push data into board array
 
   await prisma.board.create({
@@ -61,6 +68,25 @@ boardRouter.get("/boards", authMiddleware, async (req, res) => {
       error: error.flatten().fieldErrors,
     });
   const { organizationId } = data;
+
+  const userId = req.userId;
+  if (userId === undefined) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  //check if user belongs to the org of board
+  const myOrg = await prisma.organization.findFirst({
+    where: {
+      id: organizationId,
+      OR: [{ adminId: userId }, { user: { some: { id: userId } } }],
+    },
+  });
+
+  if (!myOrg) {
+    return res.status(403).json({
+      message: "You do not have accesst to this board",
+    });
+  }
 
   //find all the boards belonging to that org
   const allBoards = await prisma.board.findMany({

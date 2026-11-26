@@ -17,7 +17,7 @@ issueRouter.post("/issue", authMiddleware, async (req, res) => {
       message: "invlaid credential",
       error: error.flatten().fieldErrors,
     });
-  const { title, boardId, assignedTo } = data;
+  const { title, boardId, assignedTo, priority } = data;
 
   //find board in which issue is there
   const myBoard = await prisma.board.findUnique({
@@ -76,9 +76,10 @@ issueRouter.post("/issue", authMiddleware, async (req, res) => {
     });
   }
 
-  await prisma.issues.create({
+  const issue = await prisma.issues.create({
     data: {
       title: title,
+      priority: priority,
       board: { connect: { id: boardId } },
       assignedTo: { connect: { id: assignedUser.id } },
     },
@@ -86,6 +87,11 @@ issueRouter.post("/issue", authMiddleware, async (req, res) => {
 
   //sucess response
   res.json({
+
+   id: issue.id,
+  received: req.body.priority ?? null,
+  parsed: priority,
+  saved: issue.priority,
     message: "Issues added successfully",
   });
 });
@@ -128,8 +134,9 @@ issueRouter.get("/issues", authMiddleware, async (req, res) => {
 
   //extract all the issues belonging to that board
   const allIssues = await prisma.issues.findMany({
-    where: {
-      boardId: boardId,
+    where: { boardId: boardId },
+    include: {
+      assignedTo: { select: { username: true } },
     },
   });
 
@@ -289,4 +296,37 @@ issueRouter.put("/issues", authMiddleware, async (req, res) => {
     message: "Status changed successfully",
     status: updatedIssue.status,
   });
+});
+
+//.....delete issue...........
+issueRouter.delete("/issues", authMiddleware, async (req, res) => {
+  const userId = req.userId;
+  if (userId === undefined) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  const result = issueSchema.safeParse({
+    issueId: Number(req.query.issueId),
+  });
+
+  if (!result.success) {
+    return res.status(400).json({ message: "Invalid issue ID" });
+  }
+
+  const deleted = await prisma.issues.deleteMany({
+    where: {
+      id: result.data.issueId,
+      board: {
+        organization: {
+          OR: [{ adminId: userId }, { user: { some: { id: userId } } }],
+        },
+      },
+    },
+  });
+
+  if (deleted.count === 0) {
+    return res.status(404).json({ message: "Issue not found" });
+  }
+
+  return res.json({ message: "Issue deleted" });
 });

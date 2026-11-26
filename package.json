@@ -1,0 +1,32 @@
+{
+  "name": "taskflow",
+  "version": "1.0.0",
+  "description": "taskflow: project management application",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ary4ntomar/taskflow.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ary4ntomar/taskflow/issues"
+  },
+  "homepage": "https://github.com/ary4ntomar/taskflow#readme",
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "concurrently": "^10.0.7",
+    "prisma": "^7.10.1",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  },
+  "dependencies": {
+    "@prisma/adapter-neon": "^7.10.1",
+    "@prisma/client": "^7.10.1",
+    "dotenv": "^18.0.10",
+    "zod": "^4.6.7"
+  }
+}

@@ -129,20 +129,23 @@ orgRouter.get("/organization", authMiddleware, async (req, res) => {
       id: organizationId,
     },
     include: {
+        admin: { select: { username: true } },
       user: { select: { id: true, username: true } },
     },
   });
 
-  if (!organization || organization.adminId !== req.userId) {
-    res.status(403).json({
-      message: "Either org dosen't exist or you aren't the admin of org",
-    });
-    return;
-  }
+  if (!organization) {
+  return res.status(404).json({ message: "Organization not found" });
+}
 
-  res.json({
-    organization: organization,
-  });
+const isAdmin = organization.adminId === req.userId;
+const isMember = organization.user.some((member) => member.id === req.userId);
+
+if (!isAdmin && !isMember) {
+  return res.status(403).json({ message: "You do not have access to this organization" });
+}
+
+return res.json({ organization, isAdmin });
 });
 
 //.......Delete member from organization..........

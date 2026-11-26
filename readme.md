@@ -1,1 +1,0 @@
-> 🚧 **Status: Active Development (v0)** — taskflow is the project management webApp i created in my initial days of learning in HTML , JS , DOM and MONGODB. the current goal is to migrate project from javacript to typescript , monogdb to postgre ,dom to nextjs , refactor the code and improvise the project .
