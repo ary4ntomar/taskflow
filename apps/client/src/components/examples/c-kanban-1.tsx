@@ -306,7 +306,7 @@ export function Pattern() {
     }
   }, [issuesQuery.data])
 
-  const moveIssue = useMutation({
+   const moveIssue = useMutation({
     mutationFn: async ({
       issueId,
       status,
@@ -325,10 +325,11 @@ export function Pattern() {
         }
       )
     },
-    onSuccess: () => {
+    onError: () => {
       issuesQuery.refetch()
     },
   })
+
 
   const deleteIssue = useMutation({
     mutationFn: async (issueId: number) => {

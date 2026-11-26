@@ -1,11 +1,12 @@
 "use client"
 import { useSearchParams } from "next/navigation"
+import { Suspense } from "react"
 import { CreateIssueDialog } from "@/components/create-issue"
 import { Pattern } from "@/components/examples/c-kanban-1"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 
-export default function Issues() {
+ function IssuesContent() {
   const searchParams = useSearchParams()
   const boardId = Number(searchParams.get("boardId"))
   const hasBoard = Number.isInteger(boardId) && boardId > 0
@@ -30,5 +31,13 @@ export default function Issues() {
         <Pattern />
       </main>
     </div>
+  )
+}
+
+export default function Issues() {
+  return (
+    <Suspense fallback={null}>
+      <IssuesContent />
+    </Suspense>
   )
 }

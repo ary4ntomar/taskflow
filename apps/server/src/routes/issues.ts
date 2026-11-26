@@ -269,32 +269,28 @@ issueRouter.put("/issues", authMiddleware, async (req, res) => {
   }
   const currentStatus = myIssue.status;
 
-  if (currentStatus === "done") {
-    return res.status(200).json({
-      message: "Issue is already resolved",
-      status: currentStatus,
-    });
-  }
+ const allowedStatuses = ["upnext", "inprogress", "done"];
+const requestedStatus = req.body?.status;
 
-  let nextStatus: string;
+let nextStatus: string;
+if (typeof requestedStatus === "string" && allowedStatuses.includes(requestedStatus)) {
+  nextStatus = requestedStatus;
+} else if (currentStatus === "upnext") {
+  nextStatus = "inprogress";
+} else {
+  nextStatus = "done";
+}
 
-  if (currentStatus === "upnext") {
-    nextStatus = "inprogress";
-  } else if (currentStatus === "inprogress") {
-    nextStatus = "done";
-  } else {
-    return res.status(409).json({ message: "Unexpected issue status" });
-  }
+const updatedIssue = await prisma.issues.update({
+  where: { id: issueId },
+  data: { status: nextStatus },
+});
 
-  const updatedIssue = await prisma.issues.update({
-    where: { id: issueId },
-    data: { status: nextStatus },
-  });
+return res.json({
+  message: "Issue updated",
+  status: updatedIssue.status,
+});
 
-  return res.json({
-    message: "Status changed successfully",
-    status: updatedIssue.status,
-  });
 });
 
 //.....delete issue...........
