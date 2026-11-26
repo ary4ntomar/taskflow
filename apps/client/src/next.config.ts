@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
     return [
       {
         source: "/api/:path*",
-        destination: "https://onrender.com*",
+        destination: "https://taskflow-api-w7fa.onrender.com/:path*",
       },
     ];
   },
